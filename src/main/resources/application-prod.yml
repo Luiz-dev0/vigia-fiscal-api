@@ -1,0 +1,56 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/vigiafiscal
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
+
+notification:
+  mock: false
+  email:
+    remetente: noreply@vigiafiscal.com.br
+  whatsapp:
+    evolution-api-url: ${EVOLUTION_API_URL}
+    evolution-api-key: ${EVOLUTION_API_KEY}
+    instance-name: ${EVOLUTION_INSTANCE}
+
+cors:
+  allowed-origins:
+    - https://vigiafiscal.com.br
+    - https://www.vigiafiscal.com.br
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+  success-url: https://vigiafiscal.com.br/assinatura?checkout=success
+  cancel-url: https://vigiafiscal.com.br/assinatura?checkout=cancel
+  price-id:
+    basico: price_1TBhZSJzxCFsG21FRpJ37OZx
+    pro: price_1TBhdoJzxCFsG21FAlj9ZGdP
+    enterprise: price_1TBhf2JzxCFsG21FuIBfKKuu
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+sefaz:
+  url:
+    distribuicao: https://hom1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx
+  ambiente: "2"
+  cnpj:
+    autorizador: ""
+
+management:
+  health:
+    mail:
+      enabled: false
