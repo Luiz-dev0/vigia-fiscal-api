@@ -6,6 +6,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -15,14 +16,11 @@ public class WhatsAppSender {
     @Value("${notification.mock:true}")
     private boolean mock;
 
-    @Value("${notification.whatsapp.evolution-api-url:http://localhost:8080}")
-    private String evolutionApiUrl;
+    @Value("${notification.whatsapp.phone-number-id:}")
+    private String phoneNumberId;
 
-    @Value("${notification.whatsapp.evolution-api-key:}")
-    private String evolutionApiKey;
-
-    @Value("${notification.whatsapp.instance-name:NFeMonitor}")
-    private String instanceName;
+    @Value("${notification.whatsapp.access-token:}")
+    private String accessToken;
 
     private final RestTemplate restTemplate;
 
@@ -37,15 +35,17 @@ public class WhatsAppSender {
         }
 
         try {
-            String url = evolutionApiUrl + "/message/sendText/" + instanceName;
+            String url = "https://graph.facebook.com/v19.0/" + phoneNumberId + "/messages";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("apikey", evolutionApiKey);
+            headers.setBearerAuth(accessToken);
 
             Map<String, Object> body = Map.of(
-                    "number", numero,
-                    "text", mensagem
+                    "messaging_product", "whatsapp",
+                    "to", numero,
+                    "type", "text",
+                    "text", Map.of("body", mensagem)
             );
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
