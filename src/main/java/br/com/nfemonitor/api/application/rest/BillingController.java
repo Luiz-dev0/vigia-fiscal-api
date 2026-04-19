@@ -55,7 +55,7 @@ public class BillingController {
                 ),
                 new PlanoResponse(
                         "Enterprise",
-                        497,
+                        297,
                         0,
                         "Potência total para grandes operações.",
                         priceIds.getOrDefault("enterprise", "")
