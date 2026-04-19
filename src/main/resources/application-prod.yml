@@ -42,8 +42,8 @@ springdoc:
 
 sefaz:
   url:
-    distribuicao: https://hom1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx
-  ambiente: "2"
+    distribuicao: https://www.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx
+  ambiente: ${SEFAZ_AMBIENTE}
   cnpj:
     autorizador: ""
 
