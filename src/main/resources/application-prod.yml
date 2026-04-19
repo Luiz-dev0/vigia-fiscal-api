@@ -24,9 +24,7 @@ notification:
     access-token: ${META_WHATSAPP_ACCESS_TOKEN}
 
 cors:
-  allowed-origins:
-    - https://vigiafiscal.com.br
-    - https://www.vigiafiscal.com.br
+  allowed-origins: "https://vigiafiscal.com.br,https://www.vigiafiscal.com.br"
 
 stripe:
   secret-key: ${STRIPE_SECRET_KEY}
