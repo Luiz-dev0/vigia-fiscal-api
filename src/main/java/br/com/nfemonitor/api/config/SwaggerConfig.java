@@ -35,8 +35,7 @@ public class SwaggerConfig {
                         .license(new License()
                                 .name("Proprietário")))
                 // Aplica o esquema JWT globalmente a todos os endpoints
-                .addSecurityItem(new SecurityRequirement()
-                        .addList(SECURITY_SCHEME_NAME))
+
                 .components(new Components()
                         .addSecuritySchemes(SECURITY_SCHEME_NAME, new SecurityScheme()
                                 .name(SECURITY_SCHEME_NAME)
