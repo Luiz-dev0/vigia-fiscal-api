@@ -3,6 +3,8 @@ package br.com.nfemonitor.api.domain.nfe;
 import br.com.nfemonitor.api.application.dto.NfeResponse;
 import br.com.nfemonitor.api.domain.cnpj.Cnpj;
 import br.com.nfemonitor.api.domain.cnpj.CnpjRepository;
+import br.com.nfemonitor.api.domain.manifestacao.ManifestacaoRepository;
+import br.com.nfemonitor.api.domain.manifestacao.TipoManifestacao;
 import br.com.nfemonitor.api.domain.sefaz.SefazConsulta;
 import br.com.nfemonitor.api.domain.sefaz.SefazConsultaRepository;
 import br.com.nfemonitor.api.domain.tenant.Tenant;
@@ -31,12 +33,19 @@ public class NfeService {
     private final TenantRepository tenantRepository;
     private final SefazConsultaRepository sefazConsultaRepository;
     private final SefazClient sefazClient;
+    private final ManifestacaoRepository manifestacaoRepository; // <-- novo
+
+    private static final List<TipoManifestacao> TIPOS_FINAIS = List.of(
+            TipoManifestacao.CONFIRMACAO_OPERACAO,
+            TipoManifestacao.DESCONHECIMENTO_OPERACAO,
+            TipoManifestacao.OPERACAO_NAO_REALIZADA
+    );
 
     public List<NfeResponse> listarTodas() {
         UUID tenantId = TenantContext.get();
         return nfeRepository.findAllByTenantId(tenantId)
                 .stream()
-                .map(NfeResponse::from)
+                .map(nfe -> NfeResponse.from(nfe, calcularStatusManifestacao(nfe.getId())))
                 .toList();
     }
 
@@ -45,14 +54,14 @@ public class NfeService {
         validarCnpjDoTenant(cnpjId, tenantId);
         return nfeRepository.findAllByTenantIdAndCnpjId(tenantId, cnpjId)
                 .stream()
-                .map(NfeResponse::from)
+                .map(nfe -> NfeResponse.from(nfe, calcularStatusManifestacao(nfe.getId())))
                 .toList();
     }
 
     public NfeResponse buscarPorId(UUID id) {
         UUID tenantId = TenantContext.get();
         return nfeRepository.findByIdAndTenantId(id, tenantId)
-                .map(NfeResponse::from)
+                .map(nfe -> NfeResponse.from(nfe, calcularStatusManifestacao(nfe.getId())))
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "NF-e não encontrada"));
     }
@@ -86,7 +95,9 @@ public class NfeService {
             sefazConsultaRepository.save(consulta);
 
             log.info("Sincronizadas {} NF-es para CNPJ: {}", notasSalvas.size(), cnpj.getCnpj());
-            return notasSalvas.stream().map(NfeResponse::from).toList();
+            return notasSalvas.stream()
+                    .map(nfe -> NfeResponse.from(nfe, calcularStatusManifestacao(nfe.getId())))
+                    .toList();
 
         } catch (Exception e) {
             consulta.setSucesso(false);
@@ -99,10 +110,6 @@ public class NfeService {
         }
     }
 
-    /**
-     * Método usado pelo NfeMonitorJob.
-     * Retorna a lista de NF-es sincronizadas para avaliação de alertas.
-     */
     @Transactional
     public List<NotaFiscal> sincronizarPorCnpj(Cnpj cnpj) {
         Tenant tenant = tenantRepository.findById(cnpj.getTenant().getId())
@@ -130,7 +137,7 @@ public class NfeService {
             sefazConsultaRepository.save(consulta);
 
             log.info("[Job] Sincronizadas {} NF-es para CNPJ: {}", notasSalvas.size(), cnpj.getCnpj());
-            return notasSalvas; // <-- agora retorna a lista, não o size
+            return notasSalvas;
 
         } catch (Exception e) {
             consulta.setSucesso(false);
@@ -140,6 +147,19 @@ public class NfeService {
             log.error("[Job] Erro na consulta SEFAZ para CNPJ {}: {}", cnpj.getCnpj(), e.getMessage());
             throw new RuntimeException("Falha ao consultar SEFAZ: " + e.getMessage());
         }
+    }
+
+    // ─── helpers ────────────────────────────────────────────────────────────────
+
+    private String calcularStatusManifestacao(UUID nfeId) {
+        if (manifestacaoRepository.existsByNotaFiscalIdAndTipoEventoIn(nfeId, TIPOS_FINAIS)) {
+            return "FINAL";
+        }
+        if (manifestacaoRepository.existsByNotaFiscalIdAndTipoEvento(
+                nfeId, TipoManifestacao.CIENCIA_OPERACAO)) {
+            return "CIENCIA";
+        }
+        return null;
     }
 
     private NotaFiscal upsertNfe(NfeDados dados, Cnpj cnpj, Tenant tenant) {
