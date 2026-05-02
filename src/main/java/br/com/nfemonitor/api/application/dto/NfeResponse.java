@@ -23,9 +23,14 @@ public record NfeResponse(
         String ultimoEvento,
         UUID cnpjId,
         LocalDateTime criadoEm,
-        LocalDateTime atualizadoEm
+        LocalDateTime atualizadoEm,
+        String statusManifestacao  // "FINAL", "CIENCIA" ou null
 ) {
     public static NfeResponse from(NotaFiscal nfe) {
+        return from(nfe, null);
+    }
+
+    public static NfeResponse from(NotaFiscal nfe, String statusManifestacao) {
         return new NfeResponse(
                 nfe.getId(),
                 nfe.getChaveAcesso(),
@@ -42,7 +47,8 @@ public record NfeResponse(
                 nfe.getUltimoEvento(),
                 nfe.getCnpj().getId(),
                 nfe.getCriadoEm(),
-                nfe.getAtualizadoEm()
+                nfe.getAtualizadoEm(),
+                statusManifestacao
         );
     }
 }
