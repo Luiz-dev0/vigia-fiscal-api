@@ -1,6 +1,7 @@
 package br.com.nfemonitor.api.security;
 
 import br.com.nfemonitor.api.domain.user.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +45,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
             chain.doFilter(req, res);
+        } catch (ExpiredJwtException e) {
+            TenantContext.clear();
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.setContentType("application/json");
+            res.getWriter().write("{\"message\":\"Token expirado. Faça login novamente.\"}");
         } finally {
             TenantContext.clear();
         }
