@@ -33,7 +33,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 String email = jwtService.extrairEmail(token);
 
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    userRepository.findByEmail(email).ifPresent(user -> {
+                    var userOpt = userRepository.findByEmail(email);
+                    if (userOpt.isPresent()) {
+                        var user = userOpt.get();
                         if (jwtService.tokenValido(token, user)) {
                             var auth = new UsernamePasswordAuthenticationToken(
                                     user, null, user.getAuthorities());
@@ -41,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
                             SecurityContextHolder.getContext().setAuthentication(auth);
                             TenantContext.set(jwtService.extrairTenantId(token));
                         }
-                    });
+                    }
                 }
             }
             chain.doFilter(req, res);
