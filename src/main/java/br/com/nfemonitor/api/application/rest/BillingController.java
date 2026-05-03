@@ -11,6 +11,8 @@ import br.com.nfemonitor.api.domain.tenant.Tenant;
 import br.com.nfemonitor.api.domain.tenant.TenantRepository;
 import br.com.nfemonitor.api.infrastructure.billing.StripeClient;
 import br.com.nfemonitor.api.infrastructure.billing.StripeProperties;
+import com.stripe.model.Customer;
+import com.stripe.exception.StripeException;
 import br.com.nfemonitor.api.security.TenantContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -117,31 +119,45 @@ public class BillingController {
     @PostMapping("/assinar")
     public ResponseEntity<AssinaturaResponse> assinar(@RequestBody AssinaturaRequest request) {
         var tenantId = TenantContext.get();
-        Subscription subscription = billingService.assinar(tenantId, request.plan());
 
-        // FIX #2: cria Checkout Session do Stripe e retorna a URL para o frontend redirecionar.
-        // Se falhar (ex: ambiente de teste sem Stripe configurado), retorna checkoutUrl = null
-        // e o frontend continua normalmente sem redirecionar.
-        String checkoutUrl = null;
         try {
-            // Normaliza planKey para buscar priceId (mesmo critério do BillingService)
+            Tenant tenant = tenantRepository.findById(tenantId)
+                    .orElseThrow(() -> new RuntimeException("Tenant não encontrado"));
+
             String planKey = Normalizer
                     .normalize(request.plan().toLowerCase(), Normalizer.Form.NFD)
                     .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-            String priceId = stripeProperties.getPriceId().get(planKey);
-            checkoutUrl = stripeClient.criarCheckoutSession(
-                    subscription.getStripeCustomerId(), priceId);
-        } catch (Exception e) {
-            log.warn("Checkout Session não criada (Stripe indisponível?): {}", e.getMessage());
-        }
 
-        return ResponseEntity.ok(new AssinaturaResponse(
-                subscription.getStripeSubscriptionId(),
-                subscription.getStatus(),
-                subscription.getPlan(),
-                subscription.getCurrentPeriodEnd(),
-                checkoutUrl
-        ));
+            String priceId = stripeProperties.getPriceId().get(planKey);
+            if (priceId == null || priceId.isBlank()) {
+                throw new RuntimeException("Plano inválido: " + request.plan());
+            }
+
+            // busca ou cria o customer no Stripe
+            String customerId;
+            var existingSubscription = billingService.buscarAssinaturaAtiva(tenantId);
+            if (existingSubscription.isPresent() && existingSubscription.get().getStripeCustomerId() != null) {
+                customerId = existingSubscription.get().getStripeCustomerId();
+            } else {
+                Customer customer = stripeClient.criarCliente(tenant);
+                customerId = customer.getId();
+            }
+
+            // cria checkout session e retorna URL
+            String checkoutUrl = stripeClient.criarCheckoutSession(customerId, priceId);
+
+            return ResponseEntity.ok(new AssinaturaResponse(
+                    null,
+                    null,
+                    request.plan(),
+                    null,
+                    checkoutUrl
+            ));
+
+        } catch (Exception e) {
+            log.error("Erro ao criar checkout session para tenant {}: {}", tenantId, e.getMessage());
+            throw new RuntimeException("Falha ao iniciar checkout: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/cancelar")
