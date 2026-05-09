@@ -1,9 +1,11 @@
 package br.com.nfemonitor.api.infrastructure.notification;
 
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -13,7 +15,7 @@ public class EmailSender {
     @Value("${notification.mock:true}")
     private boolean mock;
 
-    @Value("${notification.email.remetente:nfemonitor@seudominio.com}")
+    @Value("${notification.email.remetente:noreply@vigiafiscal.com.br}")
     private String remetente;
 
     private final JavaMailSender mailSender;
@@ -29,11 +31,12 @@ public class EmailSender {
         }
 
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(remetente);
-            message.setTo(destinatario);
-            message.setSubject(assunto);
-            message.setText(corpo);
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(new InternetAddress(remetente, "Vigia Fiscal"));
+            helper.setTo(destinatario);
+            helper.setSubject(assunto);
+            helper.setText(corpo, false);
 
             mailSender.send(message);
             log.info("Email enviado com sucesso para {}", destinatario);

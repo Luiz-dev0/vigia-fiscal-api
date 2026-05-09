@@ -66,10 +66,10 @@ public class MensagemBuilder {
     public String construirAssuntoEmail(AlertEvent evento, NotaFiscal nfe) {
         String cnpj = nfe.getCnpj() != null ? nfe.getCnpj().getCnpj() : "N/A";
         return switch (evento.getEventType()) {
-            case NOTA_CANCELADA -> "[NF-e Monitor] NF-e Cancelada — CNPJ " + cnpj;
-            case NOTA_DENEGADA -> "[NF-e Monitor] NF-e Denegada — CNPJ " + cnpj;
-            case NOTA_REJEITADA -> "[NF-e Monitor] NF-e Rejeitada — CNPJ " + cnpj;
-            case PRAZO_CANCELAMENTO -> "[NF-e Monitor] Prazo de cancelamento próximo — CNPJ " + cnpj;
+            case NOTA_CANCELADA     -> "[Vigia Fiscal] NF-e Cancelada — CNPJ " + cnpj;
+            case NOTA_DENEGADA      -> "[Vigia Fiscal] NF-e Denegada — CNPJ " + cnpj;
+            case NOTA_REJEITADA     -> "[Vigia Fiscal] NF-e Rejeitada — CNPJ " + cnpj;
+            case PRAZO_CANCELAMENTO -> "[Vigia Fiscal] Prazo de cancelamento próximo — CNPJ " + cnpj;
         };
     }
 }
