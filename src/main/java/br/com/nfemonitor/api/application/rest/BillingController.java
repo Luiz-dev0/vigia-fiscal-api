@@ -43,21 +43,27 @@ public class BillingController {
         List<PlanoResponse> planos = List.of(
                 new PlanoResponse(
                         "Básico",
-                        97,
+                        29,
+                        59,
+                        "51% OFF",
                         1,
                         "Para monitoramento individual simples.",
                         priceIds.getOrDefault("basico", "")
                 ),
                 new PlanoResponse(
                         "Pro",
-                        197,
+                        159,
+                        0,
+                        null,
                         5,
                         "Escalabilidade para pequenos escritórios.",
                         priceIds.getOrDefault("pro", "")
                 ),
                 new PlanoResponse(
                         "Enterprise",
-                        297,
+                        259,
+                        0,
+                        null,
                         0,
                         "Potência total para grandes operações.",
                         priceIds.getOrDefault("enterprise", "")
