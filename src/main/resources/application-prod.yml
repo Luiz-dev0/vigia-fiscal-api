@@ -32,7 +32,7 @@ stripe:
   success-url: https://vigiafiscal.com.br/assinatura?checkout=success
   cancel-url: https://vigiafiscal.com.br/assinatura?checkout=cancel
   price-id:
-    basico: price_1TOMauFOYK0cL4qsikZZANsn
+    basico: price_1TWg17FOYK0cL4qsLo2ZkfDo
     pro: price_1TOMaqFOYK0cL4qsM8tPr5TM
     enterprise: price_1TOMauFOYK0cL4qsLD0to2Ex
 
