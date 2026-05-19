@@ -26,4 +26,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/luiz-dev0/nfe-monitor-api:latest
+          tags: ghcr.io/luiz-dev0/vigia-fiscal-api:latest

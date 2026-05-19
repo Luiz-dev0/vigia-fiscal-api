@@ -1,7 +1,9 @@
 spring:
+  application:
+    name: vigia-fiscal-api
   datasource:
-    url: jdbc:postgresql://localhost:5432/nfemonitor
-    username: nfemonitor
+    url: jdbc:postgresql://localhost:5432/vigiafiscal
+    username: vigiafiscal
     password: Vf@9mXkR2#qLpT7z
   jpa:
     hibernate:
@@ -28,11 +30,7 @@ security:
 notification:
   mock: true
   email:
-    remetente: nfemonitor@seudominio.com
-  whatsapp:
-    evolution-api-url: http://localhost:8080
-    evolution-api-key: SUA_API_KEY_AQUI
-    instance-name: NFeMonitor
+    remetente: vigiafiscal@seudominio.com
 
 cors:
   allowed-origins: http://localhost:3000,http://localhost:5173,http://localhost:4173
@@ -56,7 +54,7 @@ springdoc:
     tags-sorter: alpha
     try-it-out-enabled: true
     filter: true
-  packages-to-scan: br.com.nfemonitor
+  packages-to-scan: br.com.vigiafiscal
 
 sefaz:
   url:
