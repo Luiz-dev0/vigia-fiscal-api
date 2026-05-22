@@ -24,9 +24,7 @@ notification:
     access-token: ${META_WHATSAPP_ACCESS_TOKEN}
 
 cors:
-  allowed-origins:
-    - https://vigiafiscal.com.br
-    - https://www.vigiafiscal.com.br
+  allowed-origins: "https://vigiafiscal.com.br,https://www.vigiafiscal.com.br"
 
 stripe:
   secret-key: ${STRIPE_SECRET_KEY}
@@ -34,9 +32,9 @@ stripe:
   success-url: https://vigiafiscal.com.br/assinatura?checkout=success
   cancel-url: https://vigiafiscal.com.br/assinatura?checkout=cancel
   price-id:
-    basico: price_1TBhZSJzxCFsG21FRpJ37OZx
-    pro: price_1TBhdoJzxCFsG21FAlj9ZGdP
-    enterprise: price_1TBhf2JzxCFsG21FuIBfKKuu
+    basico: price_1TWg17FOYK0cL4qsLo2ZkfDo
+    pro: price_1TOMaqFOYK0cL4qsM8tPr5TM
+    enterprise: price_1TOMauFOYK0cL4qsLD0to2Ex
 
 springdoc:
   swagger-ui:
@@ -44,8 +42,8 @@ springdoc:
 
 sefaz:
   url:
-    distribuicao: https://hom1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx
-  ambiente: "2"
+    distribuicao: https://www.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx
+  ambiente: ${SEFAZ_AMBIENTE}
   cnpj:
     autorizador: ""
 
