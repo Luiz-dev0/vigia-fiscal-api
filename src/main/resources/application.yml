@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: vigia-fiscal-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vigiafiscal
+    username: vigiafiscal
+    password: Vf@9mXkR2#qLpT7z
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  mail:
+    host: smtp.mailtrap.io
+    port: 2525
+    username: SEU_USERNAME_MAILTRAP
+    password: SUA_SENHA_MAILTRAP
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+security:
+  jwt:
+    secret: dev-local-secret-minimo-32-caracteres-ok
+    expiration: 2592000000
+
+notification:
+  mock: true
+  email:
+    remetente: dev@vigiafiscal.com.br
+  whatsapp:
+    phone-number-id: mock
+    access-token: mock
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://vigiafiscal.com.br,https://www.vigiafiscal.com.br}
+
+stripe:
+  secret-key: sk_test_SUA_CHAVE_AQUI
+  webhook-secret: whsec_PREENCHER_DEPOIS
+  success-url: http://localhost:5173/assinatura?checkout=success
+  cancel-url: http://localhost:5173/assinatura?checkout=cancel
+  price-id:
+    basico: PRICE_ID_BASICO
+    pro: PRICE_ID_PRO
+    enterprise: PRICE_ID_ENTERPRISE
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+sefaz:
+  url:
+    distribuicao: https://hom1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx
+  ambiente: "2"
+  cnpj:
+    autorizador: ""
+
+management:
+  health:
+    mail:
+      enabled: false
