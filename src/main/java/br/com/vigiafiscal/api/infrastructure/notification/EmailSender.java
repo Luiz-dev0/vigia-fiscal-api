@@ -8,6 +8,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Slf4j
 @Component
 public class EmailSender {
@@ -18,9 +20,9 @@ public class EmailSender {
     @Value("${notification.email.remetente:noreply@vigiafiscal.com.br}")
     private String remetente;
 
-    private final JavaMailSender mailSender;
+    private final Optional<JavaMailSender> mailSender;
 
-    public EmailSender(JavaMailSender mailSender) {
+    public EmailSender(Optional<JavaMailSender> mailSender) {
         this.mailSender = mailSender;
     }
 
@@ -30,15 +32,18 @@ public class EmailSender {
             return;
         }
 
+        JavaMailSender sender = mailSender.orElseThrow(() ->
+                new IllegalStateException("JavaMailSender não configurado. Verifique spring.mail no application.yml"));
+
         try {
-            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessage message = sender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(new InternetAddress(remetente, "Vigia Fiscal"));
             helper.setTo(destinatario);
             helper.setSubject(assunto);
             helper.setText(corpo, false);
 
-            mailSender.send(message);
+            sender.send(message);
             log.info("Email enviado com sucesso para {}", destinatario);
         } catch (Exception e) {
             log.error("Erro ao enviar email para {}: {}", destinatario, e.getMessage());
