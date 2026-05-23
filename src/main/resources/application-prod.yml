@@ -9,7 +9,17 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
-
+  mail:
+    host: smtp.resend.com
+    port: 587
+    username: resend
+    password: ${RESEND_API_KEY}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 security:
   jwt:
     secret: ${JWT_SECRET}
